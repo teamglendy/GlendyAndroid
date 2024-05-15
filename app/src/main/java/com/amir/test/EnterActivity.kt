@@ -23,5 +23,9 @@ class EnterActivity : AppCompatActivity() {
             val intent=Intent(this@EnterActivity,DifficultyActivity::class.java)
             startActivity(intent)
         }
+        multi.setOnClickListener {
+            val intent=Intent(this@EnterActivity,MultiPlayerActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
