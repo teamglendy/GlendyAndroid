@@ -8,15 +8,17 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
-import android.view.View.OnTouchListener
-import android.widget.Button
 import android.widget.Toast
 import java.util.Vector
 
-/**
- * Created by Fernando on 15/8/30.
- */
-class Playground(context: Context?) : SurfaceView(context), OnTouchListener {
+class Playground(context: Context?, blockNumber:Int) : SurfaceView(context), View.OnTouchListener {
+
+    private var WIDTH = 40
+    private  val COL = 11
+    private  val ROW = 11
+    private  val BLOCKS = blockNumber
+
+
     private val matrix: Array<Array<Dot?>>
     private var cat: Dot? = null
     private fun getDot(x: Int, y: Int): Dot? {
@@ -37,28 +39,35 @@ class Playground(context: Context?) : SurfaceView(context), OnTouchListener {
             } else {
                 getDot(one.x, one.y - 1)
             }
+
             3 -> return if (one!!.y % 2 == 0) {
                 getDot(one.x, one.y - 1)
             } else {
                 getDot(one.x + 1, one.y - 1)
             }
+
             4 -> return getDot(one!!.x + 1, one.y)
             5 -> return if (one!!.y % 2 == 0) {
                 getDot(one.x, one.y + 1)
             } else {
                 getDot(one.x + 1, one.y + 1)
             }
+
             6 -> return if (one!!.y % 2 == 0) {
                 getDot(one.x - 1, one.y + 1)
             } else {
                 getDot(one.x, one.y + 1)
             }
+
             else -> {}
         }
         return null //?
     }
 
-    private fun getDistance(one: Dot?, dir: Int): Int { //checks the status of cat's neighbor dot(neighbor dot)
+    private fun getDistance(
+        one: Dot?,
+        dir: Int
+    ): Int { //checks the status of cat's neighbor dot(neighbor dot)
         var distance = 0
         if (isAtEdge(one)) {
             return 1
@@ -135,11 +144,11 @@ class Playground(context: Context?) : SurfaceView(context), OnTouchListener {
     }
 
     private fun lose() {
-        Toast.makeText(context, "Lose", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Lose!", Toast.LENGTH_SHORT).show()
     }
 
     private fun win() {
-        Toast.makeText(context, "You win", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "You won!", Toast.LENGTH_SHORT).show()
     }
 
     private fun redraw() {
@@ -196,16 +205,17 @@ class Playground(context: Context?) : SurfaceView(context), OnTouchListener {
         }
         setOnTouchListener(this)
         initGame()
+
     }
 
-    private fun initGame() {
+    fun initGame() {
         for (i in 0 until ROW) {
             for (j in 0 until COL) {
                 matrix[i][j]!!.status = Dot.STATUS_OFF
             }
         }
-        cat = Dot(4, 5)
-        getDot(4, 5)!!.status = Dot.STATUS_IN
+        cat = Dot(5, 5)
+        getDot(5, 5)!!.status = Dot.STATUS_IN
         var i = 0
         while (i < BLOCKS) {
             val x = (Math.random() * 1000 % COL).toInt()
@@ -244,10 +254,5 @@ class Playground(context: Context?) : SurfaceView(context), OnTouchListener {
         return true
     }
 
-    companion object {
-        private var WIDTH = 40
-        private const val COL = 10
-        private const val ROW = 10
-        private const val BLOCKS = 15 //default roadblock numbers 默认路障数量
-    }
 }
+
