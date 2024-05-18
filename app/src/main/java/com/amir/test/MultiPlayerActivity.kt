@@ -46,11 +46,11 @@ class MultiPlayerActivity : AppCompatActivity() {
             val p = port.text.toString()
 
             if (host.isEmpty()) {
-                hostname.error = "HostName cannot be empty!"
+                hostname.error = "HostName cannot be empty"
                 return@setOnClickListener
             }
             if (p.isEmpty()) {
-                port.error = "Port cannot be empty!"
+                port.error = "Port cannot be empty"
                 return@setOnClickListener
             }
 

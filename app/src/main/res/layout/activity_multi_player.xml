@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@android:color/holo_orange_light"
     tools:context=".MultiPlayerActivity">
 
     <EditText
@@ -44,7 +45,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="128dp"
         android:layout_marginEnd="24dp"
-        android:backgroundTint="#424242"
+        android:backgroundTint="@android:color/holo_orange_dark"
         android:padding="10dp"
         android:text="Connect"
         android:textSize="24sp"
@@ -61,6 +62,7 @@
         android:layout_marginEnd="24dp"
         android:padding="12dp"
         android:text="Enter the HostName and Port of the server"
+        android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
