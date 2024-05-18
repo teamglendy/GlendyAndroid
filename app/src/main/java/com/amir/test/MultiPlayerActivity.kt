@@ -24,7 +24,7 @@ class MultiPlayerActivity : AppCompatActivity() {
     lateinit var output: PrintWriter
     lateinit var socket: Socket
 
-    lateinit var hostName: EditText
+    lateinit var hostname: EditText
     lateinit var port: EditText
     lateinit var connect: Button
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,22 +37,24 @@ class MultiPlayerActivity : AppCompatActivity() {
             insets
         }
 
-        hostName = findViewById(R.id.hostname)
+        hostname = findViewById(R.id.hostname)
         port = findViewById(R.id.port)
         connect = findViewById(R.id.connect)
 
         connect.setOnClickListener {
-            val hoststr = hostName.text.toString()
+            val host = hostname.text.toString()
             val p = port.text.toString()
 
-            if (hoststr == null) {
-                Toast.makeText(this, "Please Enter the hostName", Toast.LENGTH_SHORT).show()
+            if (host.isEmpty()) {
+                hostname.error = "HostName cannot be empty!"
+                return@setOnClickListener
             }
-            if (p == null) {
-                p == "1768"
+            if (p.isEmpty()) {
+                port.error = "Port cannot be empty!"
+                return@setOnClickListener
             }
 
-            connect(hoststr, p.toInt())
+            connect(host, p.toInt())
         }
 
     }
@@ -99,7 +101,8 @@ class MultiPlayerActivity : AppCompatActivity() {
             "CONN" -> Log.d("Salam", r)
             "WAIT" -> Log.d("Salam", r)
             "INIT" -> {
-                Log.d("Salam", r); parseInit()
+                Log.d("Salam", r)
+                parseInit()
             }
 
             "SENT" -> Log.d("Salam", r)
@@ -130,7 +133,9 @@ class MultiPlayerActivity : AppCompatActivity() {
 
                 "w" -> Log.d("Salam", buff)
                 "g" -> Log.d("Salam", buff)
-                "SENT" -> { Log.d("Salam", buff) ; return }
+                "SENT" -> {
+                    Log.d("Salam", buff); return
+                }
 
                 else -> {
                     Toast.makeText(this, "parseInit(): got null", Toast.LENGTH_SHORT)

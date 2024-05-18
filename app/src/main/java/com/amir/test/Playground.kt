@@ -11,12 +11,12 @@ import android.view.View
 import android.widget.Toast
 import java.util.Vector
 
-class Playground(context: Context?, blockNumber:Int) : SurfaceView(context), View.OnTouchListener {
+class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), View.OnTouchListener {
 
     private var WIDTH = 40
-    private  val COL = 11
-    private  val ROW = 11
-    private  val BLOCKS = blockNumber
+    private val COL = 11
+    private val ROW = 11
+    private val BLOCKS = blockNumber
 
 
     private val matrix: Array<Array<Dot?>>
