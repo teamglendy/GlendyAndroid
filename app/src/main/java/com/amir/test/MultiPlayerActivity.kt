@@ -146,4 +146,41 @@ class MultiPlayerActivity : AppCompatActivity() {
 
         }
     }
+
+    fun putMessage(x: Int, y: Int) {
+        if (x < 0 || y < 0) {
+            Log.d("Glendy", "putMessage(" + x.toString() + ", " + y.toString() + ")")
+            return
+        }
+        output.println("p " + x.toString() + " " + y.toString())
+    }
+
+    fun moveMessage(dir: Int) {
+
+        var str: String
+
+        when (dir) {
+            1 -> str = "W"
+            2 -> str = "NW"
+            3 -> str = "NE"
+            4 -> str = "E"
+            5 -> str = "SE"
+            6 -> str = "SW"
+            else -> {
+                Log.d("Glendy", "moveMessage(" + dir.toString() + ")")
+                return
+            }
+        }
+        output.println("m " + dir.toString())
+    }
+
+    fun parsePut() {
+        // p xx yy
+
+    }
+
+    fun parseMove() {
+        // p xx yy
+
+    }
 }
