@@ -141,11 +141,15 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
             //todo: exit the program here
             when (buff) {
                 "w" -> {
-                    Log.d("Glendy", "parseInit():" + buff)
+                    Log.d("Glendy", "parseInit(): " + buff)
                     tmpDot = parsePosition(pos)
                     putWall(tmpDot!!.y, tmpDot!!.x)
                 } // pos is the string position of the wall and then putWall converts this string to int x and int y
-                "g" -> Log.d("Glendy", buff)
+                "g" -> {
+                    Log.d("Glendy", "parseInit(): " + buff)
+                    tmpDot = parsePosition(pos)
+                    putGlenda(tmpDot!!.y, tmpDot!!.x)
+                }
                 "SENT" -> {
                     redraw()
                     break
@@ -219,7 +223,10 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
             Log.d("Glendy", "putMessage(" + x.toString() + ", " + y.toString() + ")")
             return
         }
-        if (glenda != null) {
+        if (glenda == null) {
+            glenda = Dot(x,y)
+        }
+        else {
             glenda!!.status = Dot.STATUS_OFF
         }
         getDot(x, y)!!.status = Dot.STATUS_IN

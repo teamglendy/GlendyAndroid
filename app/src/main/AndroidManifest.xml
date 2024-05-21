@@ -20,9 +20,9 @@
         <activity
             android:name=".MultiPlayerActivity"
             android:exported="false" />
-        <activity
+<!--        <activity
             android:name=".MultiPlayer"
-            android:exported="true" />
+            android:exported="true" />-->
         <activity
             android:name=".DifficultyActivity"
             android:exported="false" />
