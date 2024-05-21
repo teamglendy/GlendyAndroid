@@ -40,9 +40,10 @@ class MultiPlayerActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val intent=Intent(this@MultiPlayerActivity,MultiPlayerPlayground::class.java)
+            val intent=Intent(this@MultiPlayerActivity,MultiPlayerGameActivity::class.java)
             intent.putExtra("hostname",host)
-            intent.putExtra("port",p)
+            intent.putExtra("port",p.toInt())
+            startActivity(intent)
         }
 
     }
