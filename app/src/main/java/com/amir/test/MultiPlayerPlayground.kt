@@ -26,13 +26,20 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
     lateinit var output: PrintWriter
     lateinit var socket: Socket
 
-    lateinit var matrix: Array<Array<Dot?>>
+    var matrix: Array<Array<Dot?>>
     private var glenda: Dot? = null
 
     private var WIDTH = 40
     private val COL = 11
     private val ROW = 11
 
+    var waitBit: Boolean = false
+    var player: Boolean = false
+
+    companion object {
+        const val GLENDA = true
+        const val TRAPPER = false
+    }
 
     var callback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
         override fun surfaceCreated(holder: SurfaceHolder) {
@@ -76,13 +83,14 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
 
         CoroutineScope(Dispatchers.Main).launch {
 
+            //45.94.213.254
             val textFromServer = withContext(Dispatchers.IO) {
-                socket = Socket("45.94.213.254", 1768) //todo fix
+                socket = Socket("unix.cloud9p.org", 1768) //todo fix
 
                 input = BufferedReader(InputStreamReader(socket.getInputStream()))
                 output = PrintWriter(socket.getOutputStream())
 
-                while (true) {// reads a line and passes it to parse the parse passes it to parseinit and then parseinit passes it to parseposition
+                while (true) {// reads a line and passes it to parse, the parse passes it to parseinit and then parseinit passes it to parseposition
                     var r = read()
                     parse(r!!)
                 }
@@ -96,27 +104,44 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
         var r: String
         if (input!!.contains(' ')) {
             r = input.split(" ")[0]
-        } else
+        } else {
             r = input
+        }
 
         when (r) {
             "CONN" -> Log.d("Glendy", r)
-            "WAIT" -> Log.d("Glendy", r)
+            "WAIT" -> {
+                Log.d("Glendy", r)
+                waitBit = true
+            }
+
             "INIT" -> {
                 Log.d("Glendy", r)
                 parseInit()
             }
 
             "SENT" -> Log.d("Glendy", r)
-            "TURN" -> Log.d("Glendy", r)
+            "TURN" -> {
+                Log.d("Glendy", r)
+                waitBit = false
+            }
+
             "WALL" -> Log.d("Glendy", r)
             "GLND" -> Log.d("Glendy", r)
-            "WON" -> Log.d("Glendy", r)
-            "LOST" -> Log.d("Glendy", r)
+            "WON" -> {
+                Log.d("Glendy", r)
+                Toast.makeText(context, "You won", Toast.LENGTH_SHORT).show()
+            }
+
+            "LOST" -> {
+                Log.d("Glendy", r)
+                Toast.makeText(context, "Lost", Toast.LENGTH_SHORT).show()
+            }
+
             "ERR" -> Log.d("Glendy", r)
             "DIE" -> Log.d("Glendy", r)
 
-            else -> {// To do replacement for finish()
+            else -> { //Todo replacement for finish()
                 Toast.makeText(context, "parse(): got null", Toast.LENGTH_SHORT)
                     .show()
             }
@@ -134,8 +159,8 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
                 //"[0], [1]"
                 //"w 0 1"
                 // plasht hack
-                pos = buff.split(" ")[1]  + " " + buff.split(" ")[2]
-                buff = buff.split(" ")[0]
+                pos = buff.split(" ")[1] + " " + buff.split(" ")[2]
+                buff = buff.split(" ")[0] //?
             }
             // else
             //todo: exit the program here
@@ -144,21 +169,22 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
                     Log.d("Glendy", "parseInit(): " + buff)
                     tmpDot = parsePosition(pos)
                     putWall(tmpDot!!.y, tmpDot!!.x)
-                } // pos is the string position of the wall and then putWall converts this string to int x and int y
+                } // pos is the string position of the wall and then parsePosition converts this string to int x and int y
                 "g" -> {
                     Log.d("Glendy", "parseInit(): " + buff)
                     tmpDot = parsePosition(pos)
                     putGlenda(tmpDot!!.y, tmpDot!!.x)
                 }
+
                 "SENT" -> {
                     redraw()
                     break
                 }
 
                 else -> {// to do replacement for finish
-                   // Toast.makeText(context, "parseInit(): got null", Toast.LENGTH_SHORT)
-                       // .show()
-                    Log.d("Glendy", "ParseInit(): Odd buff: "  + buff)
+                    // Toast.makeText(context, "parseInit(): got null", Toast.LENGTH_SHORT)
+                    // .show()
+                    Log.d("Glendy", "ParseInit(): Odd buff: " + buff)
                 }
             }
 
@@ -177,7 +203,7 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
 
         var str: String
 
-        when (dir) {
+        when (dir) {//?
             1 -> str = "W"
             2 -> str = "NW"
             3 -> str = "NE"
@@ -215,7 +241,8 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
             Log.d("Glendy", "putMessage(" + x.toString() + ", " + y.toString() + ")")
             return
         }
-        matrix[x][y]!!.status = Dot.STATUS_ON
+        getDot(y, x)!!.status = Dot.STATUS_ON
+        //matrix[x][y]!!.status = Dot.STATUS_ON
     }
 
     fun putGlenda(x: Int, y: Int) { //sets a glenda on the screen
@@ -223,14 +250,13 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
             Log.d("Glendy", "putMessage(" + x.toString() + ", " + y.toString() + ")")
             return
         }
-        if (glenda == null) {
-            glenda = Dot(x,y)
-        }
-        else {
+        if (glenda == null) {//?
+            glenda = Dot(x, y)
+        } else {
             glenda!!.status = Dot.STATUS_OFF
         }
-        getDot(x, y)!!.status = Dot.STATUS_IN
-        glenda!!.setXY(x, y)
+        getDot(y, x)!!.status = Dot.STATUS_IN
+        //glenda!!.setXY(x, y)
     }
 
     // "xx yy\n"
@@ -238,7 +264,7 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
         var xPos: String
         var yPos: String
 
-        if (str == null) {
+        if (str == null) {//?
             Log.d("Glendy", "parsePosition(null)")
             return null
         }
@@ -282,8 +308,7 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-/*        if (event.action == MotionEvent.ACTION_UP) {
-//            Toast.makeText(getContext(),event.getX()+":"+ event.getY(),Toast.LENGTH_SHORT).show();
+        if (event.action == MotionEvent.ACTION_UP) {
             val x: Int
             val y: Int
             y = event.y.toInt() / WIDTH
@@ -293,17 +318,19 @@ class MultiPlayerPlayground(context: Context?, hostname: String, port: Int) : Su
                 ((event.x - WIDTH / 2) / WIDTH).toInt()
             }
             if (x + 1 > COL || y + 1 > ROW) {
-                initGame()
-                //                System.out.println("----------------------------");
-//                for (int i = 1;i<7;i++){
-//                    System.out.println(i+"@"+getDistance(cat,i));
-//                }
+                //initGame()
             } else if (getDot(x, y)!!.status == Dot.STATUS_OFF) {
                 getDot(x, y)!!.status = Dot.STATUS_ON
-                move()
-            }*/
+            }
             redraw()
-        //}
+        }
         return true
+    }
+
+    fun parseConn(str: String?) {
+        if (str == null) {
+            Log.d("Glendy", "parseConn(null)")
+        }
+        TODO()
     }
 }
