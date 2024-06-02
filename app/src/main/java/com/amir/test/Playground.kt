@@ -13,6 +13,11 @@ import java.util.Vector
 
 class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), View.OnTouchListener {
 
+    var state = START
+
+    var screenHeight = 0
+    var screenWidth = 0
+
     private var WIDTH = 40
     private val COL = 11
     private val ROW = 11
@@ -21,6 +26,14 @@ class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), Vi
 
     private val matrix: Array<Array<Dot?>>
     private var cat: Dot? = null
+
+    companion object {
+        const val WIN = 0
+        const val LOSE = 1
+        const val START = 2
+        const val PLAYING = 3
+    }
+
     private fun getDot(x: Int, y: Int): Dot? {
         return matrix[y][x]
     }
@@ -88,9 +101,11 @@ class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), Vi
         }
     }
 
-    private fun MoveTo(one: Dot?) { //moves the cat to the new position on the game board (one is the next dot)
+    private fun MoveTo(one: Dot?) {
+        //moves the cat to the new position on the game board (one is the next dot)
+
         one!!.status = Dot.STATUS_IN
-        getDot(cat!!.x, cat!!.y)!!.status = Dot.STATUS_OFF
+        getDot(cat!!.x, cat!!.y)!!.status = Dot.STATUS_OFF;
         cat!!.setXY(one.x, one.y)
     }
 
@@ -119,7 +134,6 @@ class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), Vi
         } else {
             var best: Dot? = null
             if (positive.size != 0) { //Free direction exists
-                println("Step forward")
                 var min = 999
                 for (i in positive.indices) {
                     val a = getDistance(positive[i], al[positive[i]]!!)
@@ -129,7 +143,6 @@ class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), Vi
                     }
                 }
             } else { //All have blocks
-                println("Avoid Blocks")
                 var max = 0
                 for (i in avaliable.indices) {
                     val k = getDistance(avaliable[i], al[avaliable[i]]!!)
@@ -144,16 +157,27 @@ class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), Vi
     }
 
     private fun lose() {
+        state= LOSE
         Toast.makeText(context, "Lose!", Toast.LENGTH_SHORT).show()
     }
 
     private fun win() {
+        state= WIN
         Toast.makeText(context, "You won!", Toast.LENGTH_SHORT).show()
     }
 
     private fun redraw() {
         val c = holder.lockCanvas()
-        c.drawColor(Color.LTGRAY)
+        screenHeight = c.height
+        screenWidth = c.width
+
+        if(state == WIN)
+            c.drawColor(Color.GREEN)
+        else if(state == LOSE)
+            c.drawColor(Color.RED)
+        else
+          c.drawColor(Color.LTGRAY)
+
         val paint = Paint()
         paint.flags = Paint.ANTI_ALIAS_FLAG
         for (i in 0 until ROW) {
@@ -171,10 +195,10 @@ class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), Vi
                 }
                 c.drawOval(
                     RectF(
-                        (one.x * WIDTH + offset).toFloat(),
-                        (one.y * WIDTH).toFloat(),
-                        ((one.x + 1) * WIDTH + offset).toFloat(),
-                        ((one.y + 1) * WIDTH).toFloat()
+                        ((screenWidth - ROW * WIDTH) / 4 + one.x * WIDTH + offset).toFloat(),
+                        ((screenHeight - COL * WIDTH) / 2 + one.y * WIDTH).toFloat(),
+                        ((screenWidth - ROW * WIDTH) / 4 + (one.x + 1) * WIDTH + offset).toFloat(),
+                        ((screenHeight - COL * WIDTH) / 2 + (one.y + 1) * WIDTH).toFloat()
                     ), paint
                 )
             }
@@ -226,25 +250,26 @@ class Playground(context: Context?, blockNumber: Int) : SurfaceView(context), Vi
                 println("Block: $i")
             }
         }
+        state = PLAYING
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
+
         if (event.action == MotionEvent.ACTION_UP) {
 //            Toast.makeText(getContext(),event.getX()+":"+ event.getY(),Toast.LENGTH_SHORT).show();
             val x: Int
             val y: Int
-            y = event.y.toInt() / WIDTH
+
+            y = (event.y.toInt() - ((screenHeight - COL * WIDTH) / 2)) / WIDTH
+
+            // zig-zag like effect
             x = if (y % 2 == 0) {
-                (event.x / WIDTH).toInt()
+                (event.x.toInt() - ((screenWidth - COL * WIDTH) / 4)) / WIDTH
             } else {
-                ((event.x - WIDTH / 2) / WIDTH).toInt()
+                ((event.x.toInt() - ((screenWidth - COL * WIDTH) / 4)) - WIDTH / 2) / WIDTH
             }
-            if (x + 1 > COL || y + 1 > ROW) {
+            if (state == LOSE || state == WIN || x + 1 > COL || y + 1 > ROW || x < 0 || y < 0) {
                 initGame()
-                //                System.out.println("----------------------------");
-//                for (int i = 1;i<7;i++){
-//                    System.out.println(i+"@"+getDistance(cat,i));
-//                }
             } else if (getDot(x, y)!!.status == Dot.STATUS_OFF) {
                 getDot(x, y)!!.status = Dot.STATUS_ON
                 move()
