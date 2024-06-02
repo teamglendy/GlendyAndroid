@@ -32,8 +32,11 @@ class Playground() {
     private var ROW = 11
     private var BLOCKS = 0
 
-    private var cat: Dot? = null
+    private var glenda: Dot? = null
     private var matrix: Array<Array<Dot?>> = Array(ROW) { arrayOfNulls(COL) }
+
+    private var player: Boolean = TRAPPER
+    private var turn = 0
 
     companion object {
         const val WIN = 0
@@ -63,7 +66,7 @@ class Playground() {
                 matrix[i][j]!!.status = Dot.STATUS_OFF
             }
         }
-        cat = Dot(5, 5)
+        glenda = Dot(5, 5)
         getDot(5, 5)!!.status = Dot.STATUS_IN
         var i = 0
         while (i < BLOCKS) {
@@ -75,6 +78,7 @@ class Playground() {
             }
         }
         state = PLAYING
+        turn = 0
     }
 
     private fun isAtEdge(d: Dot?): Boolean {
@@ -117,9 +121,9 @@ class Playground() {
     }
 
     private fun getDistance(
-        one: Dot?,
-        dir: Int
-    ): Int { //checks the status of cat's neighbor dot(neighbor dot)
+                one: Dot?,
+                dir: Int
+    ): Int { //checks the status of glenda's neighbor dot(neighbor dot)
         var distance = 0
         if (isAtEdge(one)) {
             return 1
@@ -140,16 +144,26 @@ class Playground() {
         }
     }
 
+    private fun MoveTo(dir:Int){
+        var dst:Dot? = getNeighbor(glenda, dir)
+
+        if(dst == null){
+            return
+        }
+        MoveTo(dst)
+    }
     private fun MoveTo(one: Dot?) {
-        //moves the cat to the new position on the game board (one is the next dot)
+        //moves the glenda to the new position on the game board (one is the next dot)
 
         one!!.status = Dot.STATUS_IN
-        getDot(cat!!.x, cat!!.y)!!.status = Dot.STATUS_OFF
-        cat!!.setXY(one.x, one.y)
+        getDot(glenda!!.x, glenda!!.y)!!.status = Dot.STATUS_OFF
+        glenda!!.setXY(one.x, one.y)
+
+        turn++
     }
 
     private fun move() { //?
-        if (isAtEdge(cat)) {
+        if (isAtEdge(glenda)) {
             state = LOSE
             return
         }
@@ -157,7 +171,7 @@ class Playground() {
         val positive = Vector<Dot?>()
         val al = HashMap<Dot?, Int>()
         for (i in 1..6) {
-            val n = getNeighbor(cat, i)
+            val n = getNeighbor(glenda, i)
             if (n!!.status == Dot.STATUS_OFF) {
                 avaliable.add(n)
                 al[n] = i
@@ -293,6 +307,7 @@ class Playground() {
                     initGame()
                 } else if (getDot(x, y)!!.status == Dot.STATUS_OFF) {
                     getDot(x, y)!!.status = Dot.STATUS_ON
+                    turn++
                     move()
                 }
                 redraw()
@@ -309,19 +324,11 @@ class Playground() {
         lateinit var output: PrintWriter
         lateinit var socket: Socket
 
-        private var glenda: Dot? = null
-
-        private var WIDTH = 40
-        private val COL = 11
-        private val ROW = 11
-
         var waitBit: Boolean = false
-        var player: Boolean = false
-
 
         var callback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
-                // redraw()
+                redraw()
             }
 
             override fun surfaceChanged(
@@ -331,7 +338,7 @@ class Playground() {
                 height: Int
             ) {
                 WIDTH = width / (COL + 1)
-                // redraw()
+                redraw()
             }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {}
@@ -381,6 +388,7 @@ class Playground() {
                 r = input
             }
 
+            Log.d("Glendy", r)
             when (r) {
                 "CONN" -> Log.d("Glendy", r)
                 "WAIT" -> {
@@ -397,6 +405,25 @@ class Playground() {
                 "TURN" -> {
                     Log.d("Glendy", r)
                     waitBit = false
+                }
+                //t is the first word after sync
+                //if t is even it is glenda's turn
+                //if t is odd it is trapper's turn
+                "SYNC" -> {
+                    var t = input.split(" ")[1]
+                    if (t.toInt() % 2 == 1) {
+                        var xPos = input.split(" ")[2]
+                        var yPos = input.split(" ")[3]
+                        putWall(xPos.toInt(), yPos.toInt())
+                    }
+                    else if (t.toInt() % 2 == 0) {
+                        var dir=input.split(" ")[2]
+                        MoveTo(parseDir(dir))
+                    } else{
+
+                    }
+                    redraw()
+                    turn++
                 }
 
                 "WALL" -> Log.d("Glendy", r)
@@ -506,6 +533,7 @@ class Playground() {
         }
 
         fun putWall(x: Int, y: Int) { //sets a wall on the phone screen
+            Log.d("Glendy", "putWall( " + x.toString() + " " + y.toString() + ")")
             if (x < 0 || y < 0) {
                 Log.d("Glendy", "putMessage(" + x.toString() + ", " + y.toString() + ")")
                 return
@@ -594,6 +622,21 @@ class Playground() {
                 redraw()
             }
             return true
+        }
+
+        fun parseDir(str: String?) :Int{
+            var i:Int = 0
+            Log.d("Glendy", "parseDir(" + str + ")")
+            when (str) {//?
+                "W" -> i = 1
+                "NW" -> i = 2
+                "NE" -> i = 3
+                "E" -> i = 4
+                "SE" -> i = 5
+                "SW" -> i = 6
+                else ->{}
+            }
+            return i
         }
 
         fun parseConn(str: String?) {
