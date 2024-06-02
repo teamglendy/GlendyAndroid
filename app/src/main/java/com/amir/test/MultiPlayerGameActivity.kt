@@ -18,7 +18,7 @@ class MultiPlayerGameActivity : AppCompatActivity() {
         val hostname= intent.extras!!.getString("hostname")
         val port = intent.extras!!.getInt("port")
 
-        setContentView(MultiPlayerPlayground(this, hostname!!,port ))
+        setContentView(Playground().MultiPlayer(this, hostname!!,port ))
 
     }
 }

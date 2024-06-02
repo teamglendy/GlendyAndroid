@@ -13,7 +13,7 @@ class MainActivity() : AppCompatActivity() {
 
         val blockNumber = intent.extras!!.getInt("blockNumber")
 
-        setContentView(Playground(this, blockNumber))
+        setContentView(Playground().SinglePlayer(this, blockNumber))
     }
 
 }
