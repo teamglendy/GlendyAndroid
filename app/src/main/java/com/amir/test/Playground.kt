@@ -121,8 +121,8 @@ class Playground() {
     }
 
     private fun getDistance(
-                one: Dot?,
-                dir: Int
+        one: Dot?,
+        dir: Int
     ): Int { //checks the status of glenda's neighbor dot(neighbor dot)
         var distance = 0
         if (isAtEdge(one)) {
@@ -144,14 +144,15 @@ class Playground() {
         }
     }
 
-    private fun MoveTo(dir:Int){
-        var dst:Dot? = getNeighbor(glenda, dir)
+    private fun MoveTo(dir: Int) {
+        var dst: Dot? = getNeighbor(glenda, dir)
 
-        if(dst == null){
+        if (dst == null) {
             return
         }
         MoveTo(dst)
     }
+
     private fun MoveTo(one: Dot?) {
         //moves the glenda to the new position on the game board (one is the next dot)
 
@@ -245,11 +246,13 @@ class Playground() {
             screenHeight = c.height
             screenWidth = c.width
 
-            if (state == WIN)
-                c.drawColor(Color.GREEN)
-            else if (state == LOSE)
-                c.drawColor(Color.RED)
-            else
+            if (state == WIN) {
+                c.drawColor(Color.parseColor("#64DD17"))
+                win()
+            } else if (state == LOSE) {
+                c.drawColor(Color.parseColor("#FFCC0000"))
+                lose()
+            } else
                 c.drawColor(Color.LTGRAY)
 
             val paint = Paint()
@@ -269,10 +272,10 @@ class Playground() {
                     }
                     c.drawOval(
                         RectF(
-                            ((screenWidth - ROW * WIDTH) / 4 + one.x * WIDTH + offset).toFloat(),
-                            ((screenHeight - COL * WIDTH) / 2 + one.y * WIDTH).toFloat(),
-                            ((screenWidth - ROW * WIDTH) / 4 + (one.x + 1) * WIDTH + offset).toFloat(),
-                            ((screenHeight - COL * WIDTH) / 2 + (one.y + 1) * WIDTH).toFloat()
+                            ((screenWidth - COL * WIDTH) / 4 + one.x * WIDTH + offset).toFloat(),
+                            ((screenHeight - ROW * WIDTH) / 2 + one.y * WIDTH).toFloat(),
+                            ((screenWidth - COL * WIDTH) / 4 + (one.x + 1) * WIDTH + offset).toFloat(),
+                            ((screenHeight - ROW * WIDTH) / 2 + (one.y + 1) * WIDTH).toFloat()
                         ), paint
                     )
                 }
@@ -295,7 +298,7 @@ class Playground() {
                 val x: Int
                 val y: Int
 
-                y = (event.y.toInt() - ((screenHeight - COL * WIDTH) / 2)) / WIDTH
+                y = (event.y.toInt() - ((screenHeight - ROW * WIDTH) / 2)) / WIDTH
 
                 // zig-zag like effect
                 x = if (y % 2 == 0) {
@@ -415,11 +418,10 @@ class Playground() {
                         var xPos = input.split(" ")[2]
                         var yPos = input.split(" ")[3]
                         putWall(xPos.toInt(), yPos.toInt())
-                    }
-                    else if (t.toInt() % 2 == 0) {
-                        var dir=input.split(" ")[2]
+                    } else if (t.toInt() % 2 == 0) {
+                        var dir = input.split(" ")[2]
                         MoveTo(parseDir(dir))
-                    } else{
+                    } else {
 
                     }
                     redraw()
@@ -576,6 +578,9 @@ class Playground() {
         private fun redraw() {
             val c = holder.lockCanvas()
             c.drawColor(Color.LTGRAY)
+            screenWidth = c.width
+            screenHeight = c.height
+
             val paint = Paint()
             paint.flags = Paint.ANTI_ALIAS_FLAG
             for (i in 0 until ROW) {
@@ -593,10 +598,10 @@ class Playground() {
                     }
                     c.drawOval(
                         RectF(
-                            (one.x * WIDTH + offset).toFloat(),
-                            (one.y * WIDTH).toFloat(),
-                            ((one.x + 1) * WIDTH + offset).toFloat(),
-                            ((one.y + 1) * WIDTH).toFloat()
+                            ((screenWidth - COL * WIDTH) / 4 + one.x * WIDTH + offset).toFloat(),
+                            ((screenHeight - ROW * WIDTH) / 2 + one.y * WIDTH).toFloat(),
+                            ((screenWidth - COL * WIDTH) / 4 + (one.x + 1) * WIDTH + offset).toFloat(),
+                            ((screenHeight - ROW * WIDTH) / 2 + (one.y + 1) * WIDTH).toFloat()
                         ), paint
                     )
                 }
@@ -608,14 +613,15 @@ class Playground() {
             if (event.action == MotionEvent.ACTION_UP) {
                 val x: Int
                 val y: Int
-                y = event.y.toInt() / WIDTH
+
+                y = (event.y.toInt() - ((screenHeight - ROW * WIDTH) / 2)) / WIDTH
                 x = if (y % 2 == 0) {
-                    (event.x / WIDTH).toInt()
+                    (event.x.toInt() - ((screenWidth - COL * WIDTH) / 4)) / WIDTH
                 } else {
-                    ((event.x - WIDTH / 2) / WIDTH).toInt()
+                    ((event.x.toInt() - ((screenWidth - COL * WIDTH) / 4)) - WIDTH / 2) / WIDTH
                 }
-                if (x + 1 > COL || y + 1 > ROW) {
-                    //initGame()
+                if (state == LOSE || state == WIN || x + 1 > COL || y + 1 > ROW || x < 0 || y < 0) {
+                    initGame()
                 } else if (getDot(x, y)!!.status == Dot.STATUS_OFF) {
                     getDot(x, y)!!.status = Dot.STATUS_ON
                 }
@@ -624,8 +630,8 @@ class Playground() {
             return true
         }
 
-        fun parseDir(str: String?) :Int{
-            var i:Int = 0
+        fun parseDir(str: String?): Int {
+            var i: Int = 0
             Log.d("Glendy", "parseDir(" + str + ")")
             when (str) {//?
                 "W" -> i = 1
@@ -634,7 +640,7 @@ class Playground() {
                 "E" -> i = 4
                 "SE" -> i = 5
                 "SW" -> i = 6
-                else ->{}
+                else -> {}
             }
             return i
         }
