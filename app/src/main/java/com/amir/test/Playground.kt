@@ -10,10 +10,8 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -21,6 +19,8 @@ import java.net.Socket
 import java.util.Vector
 
 class Playground() {
+
+    lateinit var best: Dot
 
     private var state = START
 
@@ -35,7 +35,7 @@ class Playground() {
     private var glenda: Dot? = null
     private var matrix: Array<Array<Dot?>> = Array(ROW) { arrayOfNulls(COL) }
 
-    private var player: Boolean = TRAPPER
+    private var player: Int = TRAPPER
     private var turn = 0
 
     companion object {
@@ -44,8 +44,8 @@ class Playground() {
         const val START = 2
         const val PLAYING = 3
 
-        const val GLENDA = true
-        const val TRAPPER = false
+        const val TRAPPER = 0
+        const val GLENDA = 1
     }
 
     private fun getDot(x: Int, y: Int): Dot? {
@@ -144,7 +144,7 @@ class Playground() {
         }
     }
 
-    private fun MoveTo(dir: Int) {
+    private fun Moveto(dir: Int) {
         var dst: Dot? = getNeighbor(glenda, dir)
 
         if (dst == null) {
@@ -156,59 +156,128 @@ class Playground() {
     private fun MoveTo(one: Dot?) {
         //moves the glenda to the new position on the game board (one is the next dot)
 
-        one!!.status = Dot.STATUS_IN
+        one?.status = Dot.STATUS_IN
         getDot(glenda!!.x, glenda!!.y)!!.status = Dot.STATUS_OFF
-        glenda!!.setXY(one.x, one.y)
+        glenda!!.setXY(one!!.x, one!!.y)
 
         turn++
     }
 
-    private fun move() { //?
+/*    private fun move() {
         if (isAtEdge(glenda)) {
             state = LOSE
             return
         }
-        val avaliable = Vector<Dot?>()
-        val positive = Vector<Dot?>()
-        val al = HashMap<Dot?, Int>()
-        for (i in 1..6) {
-            val n = getNeighbor(glenda, i)
-            if (n!!.status == Dot.STATUS_OFF) {
-                avaliable.add(n)
-                al[n] = i
-                if (getDistance(n, i) > 0) {
-                    positive.add(n)
+
+        val visited = HashSet<Dot>()
+        val distance = HashMap<Dot?, Int>()
+        val previous = HashMap<Dot?, Dot?>()
+
+        // Initialize all distances to infinity except for the starting dot
+        for (dot in matrix.flatten().filterNotNull()) {
+            distance[dot] = Int.MAX_VALUE
+        }
+        distance[glenda] = 0
+
+        while (visited.size < matrix.size * matrix[0].size) {
+            // Find the dot with the minimum distance among unvisited dots
+            var minDistance = Int.MAX_VALUE
+            var currentDot: Dot? = null
+            for (dot in matrix.flatten().filterNotNull()) {
+                if (!visited.contains(dot) && distance[dot]!! < minDistance) {
+                    minDistance = distance[dot]!!
+                    currentDot = dot
+                }
+            }
+
+            if (currentDot == null) {
+                break
+            }
+
+            visited.add(currentDot)
+
+            // Update distances for neighboring dots
+            for (i in 1..6) {
+                val neighbor = getNeighbor(currentDot, i)
+                if (neighbor != null && neighbor.status == Dot.STATUS_OFF && !visited.contains(
+                        neighbor
+                    )
+                ) {
+                    val edgeWeight = 1 // Assuming all edges have the same weight
+                    val newDistance = distance[currentDot]!! + edgeWeight
+
+                    if (newDistance < distance[neighbor]!!) {
+                        distance[neighbor] = newDistance
+                        previous[neighbor] = currentDot
+                    }
                 }
             }
         }
-        if (avaliable.size == 0) {
-            state = WIN
-        } else if (avaliable.size == 1) {
-            MoveTo(avaliable[0])
-        } else {
-            var best: Dot? = null
-            if (positive.size != 0) { //Free direction exists
-                var min = 999
-                for (i in positive.indices) {
-                    val a = getDistance(positive[i], al[positive[i]]!!)
-                    if (a < min) {
-                        min = a
-                        best = positive[i]
-                    }
-                }
-            } else { //All have blocks
-                var max = 0
-                for (i in avaliable.indices) {
-                    val k = getDistance(avaliable[i], al[avaliable[i]]!!)
-                    if (k <= max) {
-                        max = k
-                        best = avaliable[i]
-                    }
-                }
+
+        // Find the dot with the shortest distance as the best move
+
+        var minDistance = Int.MAX_VALUE
+        for (dot in matrix.flatten().filterNotNull()) {
+            if (distance[dot]!! < minDistance && dot?.status == Dot.STATUS_OFF) {
+                best = dot
+                minDistance = distance[dot]!!
             }
+        }
+
+        if (best == null) {
+            state = PLAYING
+            MoveTo(best)
+        } else {
             MoveTo(best)
         }
-    }
+    }*/
+
+        private fun move() { //?
+            if (isAtEdge(glenda)) {
+                state = LOSE
+                return
+            }
+            val avaliable = Vector<Dot?>()
+            val positive = Vector<Dot?>()
+            val al = HashMap<Dot?, Int>()
+            for (i in 1..6) {
+                val n = getNeighbor(glenda, i)
+                if (n!!.status == Dot.STATUS_OFF) {
+                    avaliable.add(n)
+                    al[n] = i
+                    if (getDistance(n, i) > 0) {
+                        positive.add(n)
+                    }
+                }
+            }
+            if (avaliable.size == 0) {
+                state = WIN
+            } else if (avaliable.size == 1) {
+                MoveTo(avaliable[0])
+            } else {
+                var best: Dot? = null
+                if (positive.size != 0) { //Free direction exists
+                    var min = 999
+                    for (i in positive.indices) {
+                        val a = getDistance(positive[i], al[positive[i]]!!)
+                        if (a < min) {
+                            min = a
+                            best = positive[i]
+                        }
+                    }
+                } else { //All have blocks
+                    var max = 0
+                    for (i in avaliable.indices) {
+                        val k = getDistance(avaliable[i], al[avaliable[i]]!!)
+                        if (k <= max) {
+                            max = k
+                            best = avaliable[i]
+                        }
+                    }
+                }
+                MoveTo(best)
+            }
+        }
 
     inner class SinglePlayer(context: Context?, blockNumber: Int) : SurfaceView(context),
         View.OnTouchListener {
@@ -320,7 +389,15 @@ class Playground() {
 
     }
 
-    inner class MultiPlayer(context: Context?, hostname: String, port: Int) : SurfaceView(context),
+    inner class MultiPlayer(
+        context: Context?,
+        hostname: String,
+        port: Int,
+        nickName: String,
+        game: Int,
+        side: Int,
+        opts: Int
+    ) : SurfaceView(context),
         View.OnTouchListener {
 
         lateinit var input: BufferedReader
@@ -351,36 +428,54 @@ class Playground() {
             holder.addCallback(callback)
             setOnTouchListener(this)
             setupmatrix()
-            connect(hostname, port)
+            connect(hostname, port, nickName, game, side, opts)
             initGame()
 
         }
 
         fun read(): String? {
-            var r = input.readLine()
-
-            return r
+            try {
+                var r = input.readLine()
+                return r
+            } catch (ex: Exception) {
+                return null
+            }
         }
 
-        fun connect(hostName: String, port: Int) {
+        fun connect(
+            hostName: String,
+            port: Int,
+            nickName: String,
+            game: Int,
+            side: Int,
+            opts: Int
+        ) {
 
-            CoroutineScope(Dispatchers.Main).launch {
+            //CoroutineScope(Dispatchers.Main).launch {
 
-                //45.94.213.254
-                val textFromServer = withContext(Dispatchers.IO) {
-                    socket = Socket(hostName, port) //todo fix
+            //45.94.213.254
+            val textFromServer = GlobalScope.launch {
+                if (hostName == "a") {
+                    socket = Socket("unix.cloud9p.org", 1768)
+                } else
+                    socket = Socket(hostName, port) //todo: fix ipv6
 
-                    input = BufferedReader(InputStreamReader(socket.getInputStream()))
-                    output = PrintWriter(socket.getOutputStream())
+                input = BufferedReader(InputStreamReader(socket.getInputStream()))
+                output = PrintWriter(socket.getOutputStream())
 
-                    while (true) {// reads a line and passes it to parse, the parse passes it to parseinit and then parseinit passes it to parseposition
-                        var r = read()
-                        parse(r!!)
-                    }
+                output.printf("%s %d %d %d\n", nickName, game, side, opts)
+                output.flush()
+                // output.println(nickName + " " + game.toString() + " " + side.toString() + " " + opts.toString());
+                while (true) {// reads a line and passes it to parse, the parse passes it to parseinit and then parseinit passes it to parseposition
+                    var r = read()
+                    if (r == null)
+                        break
+                    parse(r!!)
                 }
-
-                Log.d("Glendy", "Connected to server")
             }
+
+            Log.d("Glendy", "Connected to server")
+            //}
         }
 
         fun parse(input: String?) {//checks different states
@@ -391,22 +486,27 @@ class Playground() {
                 r = input
             }
 
-            Log.d("Glendy", r)
+            Log.d("Glendy", input)
             when (r) {
-                "CONN" -> Log.d("Glendy", r)
+                "CONN" -> {
+                    var side = input.split(" ")[1]
+                    if (side == "0") {
+                        player = TRAPPER
+                    } else if (side == "1") {
+                        player = GLENDA
+                    }
+                }
+
                 "WAIT" -> {
-                    Log.d("Glendy", r)
                     waitBit = true
                 }
 
                 "INIT" -> {
-                    Log.d("Glendy", r)
                     parseInit()
                 }
 
-                "SENT" -> Log.d("Glendy", r)
                 "TURN" -> {
-                    Log.d("Glendy", r)
+
                     waitBit = false
                 }
                 //t is the first word after sync
@@ -414,30 +514,31 @@ class Playground() {
                 //if t is odd it is trapper's turn
                 "SYNC" -> {
                     var t = input.split(" ")[1]
-                    if (t.toInt() % 2 == 1) {
+                    if (t.toInt() % 2 == GLENDA) {
                         var xPos = input.split(" ")[2]
                         var yPos = input.split(" ")[3]
-                        putWall(xPos.toInt(), yPos.toInt())
-                    } else if (t.toInt() % 2 == 0) {
+                        putWall(yPos.toInt(), xPos.toInt())
+                        turn++
+                    } else if (t.toInt() % 2 == TRAPPER) {
                         var dir = input.split(" ")[2]
-                        MoveTo(parseDir(dir))
+                        Moveto(parseDir(dir))
                     } else {
 
                     }
                     redraw()
-                    turn++
                 }
 
                 "WALL" -> Log.d("Glendy", r)
                 "GLND" -> Log.d("Glendy", r)
                 "WON" -> {
-                    Log.d("Glendy", r)
-                    Toast.makeText(context, "You won", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, "You won", Toast.LENGTH_SHORT).show()
+                    state = WIN
+                    redraw()
                 }
 
                 "LOST" -> {
-                    Log.d("Glendy", r)
-                    Toast.makeText(context, "Lost", Toast.LENGTH_SHORT).show()
+                    state = LOSE
+                    redraw()
                 }
 
                 "ERR" -> Log.d("Glendy", r)
@@ -498,7 +599,11 @@ class Playground() {
                 Log.d("Glendy", "putMessage(" + x.toString() + ", " + y.toString() + ")")
                 return
             }
-            output.println("p " + x.toString() + " " + y.toString())
+            Log.d("Glendy", "p " + x.toString() + " " + y.toString())
+            GlobalScope.launch {
+                output.println("p " + x.toString() + " " + y.toString())
+                output.flush()
+            }
         }
 
         fun moveMessage(dir: Int) { // says to server that witch direction is glenda moving to
@@ -517,17 +622,20 @@ class Playground() {
                     return
                 }
             }
-            output.println("m " + dir.toString())
+            GlobalScope.launch {
+                output.println("m " + str)
+                output.flush()
+            }
         }
 
-        fun parsePut() {
-            // p xx yy
-
-        }
-
-        fun parseMove() {
-            // p xx yy
-
+        fun toDir(one: Dot): Int {
+            var dst: Dot
+            for (i in 1..6) {
+                dst = getNeighbor(glenda, i)!!
+                if (dst.x == one.x && dst.y == one.y)
+                    return i;
+            }
+            return 0;
         }
 
         fun initGame() {
@@ -577,7 +685,15 @@ class Playground() {
 
         private fun redraw() {
             val c = holder.lockCanvas()
-            c.drawColor(Color.LTGRAY)
+            if (state == WIN) {
+                c.drawColor(Color.parseColor("#64DD17"))
+                //    win()
+            } else if (state == LOSE) {
+                c.drawColor(Color.parseColor("#FFCC0000"))
+                //    lose()
+            } else
+                c.drawColor(Color.LTGRAY)
+
             screenWidth = c.width
             screenHeight = c.height
 
@@ -610,6 +726,9 @@ class Playground() {
         }
 
         override fun onTouch(v: View, event: MotionEvent): Boolean {
+            if (turn % 2 != player) {
+                return true
+            }
             if (event.action == MotionEvent.ACTION_UP) {
                 val x: Int
                 val y: Int
@@ -621,12 +740,22 @@ class Playground() {
                     ((event.x.toInt() - ((screenWidth - COL * WIDTH) / 4)) - WIDTH / 2) / WIDTH
                 }
                 if (state == LOSE || state == WIN || x + 1 > COL || y + 1 > ROW || x < 0 || y < 0) {
-                    initGame()
-                } else if (getDot(x, y)!!.status == Dot.STATUS_OFF) {
-                    getDot(x, y)!!.status = Dot.STATUS_ON
+                    ;
+                } else if (player == TRAPPER) {
+                    if (getDot(x, y)!!.status == Dot.STATUS_OFF) {
+                        putMessage(x, y)
+                    }
+                } else if (player == GLENDA) {
+                    if (getDot(x, y)!!.status == Dot.STATUS_OFF) {
+                        val dir: Int = toDir(getDot(x, y)!!)
+                        if (dir == 0)
+                            return true
+                        moveMessage(dir)
+                    }
                 }
                 redraw()
             }
+
             return true
         }
 
