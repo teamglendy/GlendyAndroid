@@ -3,6 +3,8 @@ package com.amir.test
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.PorterDuff
 import android.graphics.RectF
 import android.util.Log
 import android.view.MotionEvent
@@ -17,6 +19,7 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.Socket
 import java.util.Vector
+
 
 class Playground() {
 
@@ -163,121 +166,121 @@ class Playground() {
         turn++
     }
 
-/*    private fun move() {
-        if (isAtEdge(glenda)) {
-            state = LOSE
-            return
-        }
-
-        val visited = HashSet<Dot>()
-        val distance = HashMap<Dot?, Int>()
-        val previous = HashMap<Dot?, Dot?>()
-
-        // Initialize all distances to infinity except for the starting dot
-        for (dot in matrix.flatten().filterNotNull()) {
-            distance[dot] = Int.MAX_VALUE
-        }
-        distance[glenda] = 0
-
-        while (visited.size < matrix.size * matrix[0].size) {
-            // Find the dot with the minimum distance among unvisited dots
-            var minDistance = Int.MAX_VALUE
-            var currentDot: Dot? = null
-            for (dot in matrix.flatten().filterNotNull()) {
-                if (!visited.contains(dot) && distance[dot]!! < minDistance) {
-                    minDistance = distance[dot]!!
-                    currentDot = dot
-                }
-            }
-
-            if (currentDot == null) {
-                break
-            }
-
-            visited.add(currentDot)
-
-            // Update distances for neighboring dots
-            for (i in 1..6) {
-                val neighbor = getNeighbor(currentDot, i)
-                if (neighbor != null && neighbor.status == Dot.STATUS_OFF && !visited.contains(
-                        neighbor
-                    )
-                ) {
-                    val edgeWeight = 1 // Assuming all edges have the same weight
-                    val newDistance = distance[currentDot]!! + edgeWeight
-
-                    if (newDistance < distance[neighbor]!!) {
-                        distance[neighbor] = newDistance
-                        previous[neighbor] = currentDot
-                    }
-                }
-            }
-        }
-
-        // Find the dot with the shortest distance as the best move
-
-        var minDistance = Int.MAX_VALUE
-        for (dot in matrix.flatten().filterNotNull()) {
-            if (distance[dot]!! < minDistance && dot?.status == Dot.STATUS_OFF) {
-                best = dot
-                minDistance = distance[dot]!!
-            }
-        }
-
-        if (best == null) {
-            state = PLAYING
-            MoveTo(best)
-        } else {
-            MoveTo(best)
-        }
-    }*/
-
-        private fun move() { //?
+    /*    private fun move() {
             if (isAtEdge(glenda)) {
                 state = LOSE
                 return
             }
-            val avaliable = Vector<Dot?>()
-            val positive = Vector<Dot?>()
-            val al = HashMap<Dot?, Int>()
-            for (i in 1..6) {
-                val n = getNeighbor(glenda, i)
-                if (n!!.status == Dot.STATUS_OFF) {
-                    avaliable.add(n)
-                    al[n] = i
-                    if (getDistance(n, i) > 0) {
-                        positive.add(n)
+
+            val visited = HashSet<Dot>()
+            val distance = HashMap<Dot?, Int>()
+            val previous = HashMap<Dot?, Dot?>()
+
+            // Initialize all distances to infinity except for the starting dot
+            for (dot in matrix.flatten().filterNotNull()) {
+                distance[dot] = Int.MAX_VALUE
+            }
+            distance[glenda] = 0
+
+            while (visited.size < matrix.size * matrix[0].size) {
+                // Find the dot with the minimum distance among unvisited dots
+                var minDistance = Int.MAX_VALUE
+                var currentDot: Dot? = null
+                for (dot in matrix.flatten().filterNotNull()) {
+                    if (!visited.contains(dot) && distance[dot]!! < minDistance) {
+                        minDistance = distance[dot]!!
+                        currentDot = dot
+                    }
+                }
+
+                if (currentDot == null) {
+                    break
+                }
+
+                visited.add(currentDot)
+
+                // Update distances for neighboring dots
+                for (i in 1..6) {
+                    val neighbor = getNeighbor(currentDot, i)
+                    if (neighbor != null && neighbor.status == Dot.STATUS_OFF && !visited.contains(
+                            neighbor
+                        )
+                    ) {
+                        val edgeWeight = 1 // Assuming all edges have the same weight
+                        val newDistance = distance[currentDot]!! + edgeWeight
+
+                        if (newDistance < distance[neighbor]!!) {
+                            distance[neighbor] = newDistance
+                            previous[neighbor] = currentDot
+                        }
                     }
                 }
             }
-            if (avaliable.size == 0) {
-                state = WIN
-            } else if (avaliable.size == 1) {
-                MoveTo(avaliable[0])
-            } else {
-                var best: Dot? = null
-                if (positive.size != 0) { //Free direction exists
-                    var min = 999
-                    for (i in positive.indices) {
-                        val a = getDistance(positive[i], al[positive[i]]!!)
-                        if (a < min) {
-                            min = a
-                            best = positive[i]
-                        }
-                    }
-                } else { //All have blocks
-                    var max = 0
-                    for (i in avaliable.indices) {
-                        val k = getDistance(avaliable[i], al[avaliable[i]]!!)
-                        if (k <= max) {
-                            max = k
-                            best = avaliable[i]
-                        }
-                    }
+
+            // Find the dot with the shortest distance as the best move
+
+            var minDistance = Int.MAX_VALUE
+            for (dot in matrix.flatten().filterNotNull()) {
+                if (distance[dot]!! < minDistance && dot?.status == Dot.STATUS_OFF) {
+                    best = dot
+                    minDistance = distance[dot]!!
                 }
+            }
+
+            if (best == null) {
+                state = PLAYING
+                MoveTo(best)
+            } else {
                 MoveTo(best)
             }
+        }*/
+
+    private fun move() { //?
+        if (isAtEdge(glenda)) {
+            state = LOSE
+            return
         }
+        val avaliable = Vector<Dot?>()
+        val positive = Vector<Dot?>()
+        val al = HashMap<Dot?, Int>()
+        for (i in 1..6) {
+            val n = getNeighbor(glenda, i)
+            if (n!!.status == Dot.STATUS_OFF) {
+                avaliable.add(n)
+                al[n] = i
+                if (getDistance(n, i) > 0) {
+                    positive.add(n)
+                }
+            }
+        }
+        if (avaliable.size == 0) {
+            state = WIN
+        } else if (avaliable.size == 1) {
+            MoveTo(avaliable[0])
+        } else {
+            var best: Dot? = null
+            if (positive.size != 0) { //Free direction exists
+                var min = 999
+                for (i in positive.indices) {
+                    val a = getDistance(positive[i], al[positive[i]]!!)
+                    if (a < min) {
+                        min = a
+                        best = positive[i]
+                    }
+                }
+            } else { //All have blocks
+                var max = 0
+                for (i in avaliable.indices) {
+                    val k = getDistance(avaliable[i], al[avaliable[i]]!!)
+                    if (k <= max) {
+                        max = k
+                        best = avaliable[i]
+                    }
+                }
+            }
+            MoveTo(best)
+        }
+    }
 
     inner class SinglePlayer(context: Context?, blockNumber: Int) : SurfaceView(context),
         View.OnTouchListener {
@@ -311,6 +314,10 @@ class Playground() {
         }
 
         private fun redraw() {
+            setZOrderOnTop(true) // necessary
+            val h = holder
+            h.setFormat(PixelFormat.TRANSPARENT)
+
             val c = holder.lockCanvas()
             screenHeight = c.height
             screenWidth = c.width
@@ -322,7 +329,7 @@ class Playground() {
                 c.drawColor(Color.parseColor("#FFCC0000"))
                 lose()
             } else
-                c.drawColor(Color.LTGRAY)
+                c.drawColor(0, PorterDuff.Mode.CLEAR)
 
             val paint = Paint()
             paint.flags = Paint.ANTI_ALIAS_FLAG
@@ -334,7 +341,7 @@ class Playground() {
                 for (j in 0 until COL) {
                     val one = getDot(j, i)
                     when (one!!.status) {
-                        Dot.STATUS_OFF -> paint.color = -0x111112
+                        Dot.STATUS_OFF -> paint.setColor(Color.parseColor("#90A4AE"))
                         Dot.STATUS_ON -> paint.color = -0x5600
                         Dot.STATUS_IN -> paint.color = -0x10000
                         else -> {}
@@ -352,11 +359,11 @@ class Playground() {
             holder.unlockCanvasAndPost(c)
         }
 
-        private fun lose() {
+        fun lose() {
             Toast.makeText(context, "Lose!", Toast.LENGTH_SHORT).show()
         }
 
-        private fun win() {
+        fun win() {
             Toast.makeText(context, "You won!", Toast.LENGTH_SHORT).show()
         }
 
@@ -451,14 +458,9 @@ class Playground() {
             opts: Int
         ) {
 
-            //CoroutineScope(Dispatchers.Main).launch {
-
             //45.94.213.254
             val textFromServer = GlobalScope.launch {
-                if (hostName == "a") {
-                    socket = Socket("unix.cloud9p.org", 1768)
-                } else
-                    socket = Socket(hostName, port) //todo: fix ipv6
+                socket = Socket(hostName, port) //todo: fix ipv6
 
                 input = BufferedReader(InputStreamReader(socket.getInputStream()))
                 output = PrintWriter(socket.getOutputStream())
@@ -475,7 +477,7 @@ class Playground() {
             }
 
             Log.d("Glendy", "Connected to server")
-            //}
+
         }
 
         fun parse(input: String?) {//checks different states
@@ -531,7 +533,6 @@ class Playground() {
                 "WALL" -> Log.d("Glendy", r)
                 "GLND" -> Log.d("Glendy", r)
                 "WON" -> {
-//                    Toast.makeText(context, "You won", Toast.LENGTH_SHORT).show()
                     state = WIN
                     redraw()
                 }
@@ -684,15 +685,17 @@ class Playground() {
         }
 
         private fun redraw() {
+            setZOrderOnTop(true)
+            val h = holder
+            h.setFormat(PixelFormat.TRANSPARENT)
+
             val c = holder.lockCanvas()
             if (state == WIN) {
                 c.drawColor(Color.parseColor("#64DD17"))
-                //    win()
             } else if (state == LOSE) {
                 c.drawColor(Color.parseColor("#FFCC0000"))
-                //    lose()
             } else
-                c.drawColor(Color.LTGRAY)
+                c.drawColor(0, PorterDuff.Mode.CLEAR)
 
             screenWidth = c.width
             screenHeight = c.height
@@ -707,7 +710,7 @@ class Playground() {
                 for (j in 0 until COL) {
                     val one = getDot(j, i)
                     when (one!!.status) {
-                        Dot.STATUS_OFF -> paint.color = -0x111112
+                        Dot.STATUS_OFF -> paint.setColor(Color.parseColor("#90A4AE"))
                         Dot.STATUS_ON -> paint.color = -0x5600
                         Dot.STATUS_IN -> paint.color = -0x10000
                         else -> {}

@@ -2,6 +2,7 @@ package com.amir.test
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
@@ -28,6 +29,8 @@ class MultiPlayerActivity : AppCompatActivity() {
             insets
         }
 
+        this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
         hostname = findViewById(R.id.hostname)
         port = findViewById(R.id.port)
         connect = findViewById(R.id.connect)
@@ -36,7 +39,8 @@ class MultiPlayerActivity : AppCompatActivity() {
         trapper = findViewById(R.id.trapper)
         glenda = findViewById(R.id.glenda)
 
-
+        hostname.setText("unix.cloud9p.org")
+        port.setText("1768")
 
         connect.setOnClickListener {
             val host = hostname.text.toString()
@@ -58,6 +62,7 @@ class MultiPlayerActivity : AppCompatActivity() {
             }
             if (nameString.length > 8) {
                 name.error = "name too long"
+                return@setOnClickListener
             } else if (nameString.isNullOrEmpty()) {
                 nameString = "@"
             }

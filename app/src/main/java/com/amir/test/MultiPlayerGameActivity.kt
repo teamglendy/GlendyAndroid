@@ -1,6 +1,7 @@
 package com.amir.test
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 
@@ -14,6 +15,8 @@ class MultiPlayerGameActivity : AppCompatActivity() {
                     v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
                     insets
                 }*/
+
+        this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         val hostname = intent.extras!!.getString("hostname")
         val port = intent.extras!!.getInt("port")
