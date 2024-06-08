@@ -143,11 +143,10 @@ class Playground() {
             if (next!!.status == Dot.STATUS_ON) {
                 return distance * -1
             }
+            distance++
             if (isAtEdge(next)) {
-                distance++
                 return distance
             }
-            distance++
             ori = next
         }
     }
@@ -241,10 +240,6 @@ class Playground() {
         }*/
 
     private fun move() { //?
-        if (isAtEdge(glenda)) {
-            state = LOSE
-            return
-        }
         val avaliable = Vector<Dot?>()
         val positive = Vector<Dot?>()
         val al = HashMap<Dot?, Int>()
@@ -258,10 +253,10 @@ class Playground() {
                 }
             }
         }
-        if (avaliable.size == 0) {
+        if(avaliable.size == 0)
             state = WIN
-        } else if (avaliable.size == 1) {
-            MoveTo(avaliable[0])
+        else if (avaliable.size == 1) {
+            best = avaliable[0]!!
         } else {
             var best: Dot? = null
             if (positive.size != 0) { //Free direction exists
@@ -284,6 +279,8 @@ class Playground() {
                 }
             }
             MoveTo(best)
+            if (isAtEdge(glenda))
+                state = LOSE
         }
     }
 
@@ -413,6 +410,7 @@ class Playground() {
         View.OnTouchListener {
 
         var waitBit: Boolean = false
+        var connected = false
 
         var callback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
@@ -513,10 +511,10 @@ class Playground() {
 
                 "INIT" -> {
                     parseInit()
+                    connected = true
                 }
 
                 "TURN" -> {
-
                     waitBit = false
                 }
                 //t is the first word after sync
@@ -538,8 +536,6 @@ class Playground() {
                     redraw()
                 }
 
-                "WALL" -> Log.d("Glendy", r)
-                "GLND" -> Log.d("Glendy", r)
                 "WON" -> {
                     state = WIN
                     redraw()
@@ -552,6 +548,11 @@ class Playground() {
 
                 "ERR" -> Log.d("Glendy", r)
                 "DIE" -> Log.d("Glendy", r)
+
+                "UGUD" -> {
+                    output.println("y")
+                    output.flush()
+                }
 
                 else -> { //Todo replacement for finish()
                     Toast.makeText(context, "parse(): got null", Toast.LENGTH_SHORT)
@@ -694,8 +695,7 @@ class Playground() {
 
         private fun redraw() {
             setZOrderOnTop(true)
-            val h = holder
-            h.setFormat(PixelFormat.TRANSPARENT)
+            holder.setFormat(PixelFormat.TRANSPARENT)
 
             val c = holder.lockCanvas()
             if (state == WIN) {
@@ -703,7 +703,7 @@ class Playground() {
             } else if (state == LOSE) {
                 c.drawColor(Color.parseColor("#FFCC0000"))
             } else
-                c.drawColor(0, PorterDuff.Mode.CLEAR)
+                c.drawColor(0, PorterDuff.Mode.CLEAR)//RGBA
 
             screenWidth = c.width
             screenHeight = c.height
@@ -737,7 +737,7 @@ class Playground() {
         }
 
         override fun onTouch(v: View, event: MotionEvent): Boolean {
-            if (turn % 2 != player) {
+            if (!connected || turn % 2 != player) {
                 return true
             }
             if (event.action == MotionEvent.ACTION_UP) {
