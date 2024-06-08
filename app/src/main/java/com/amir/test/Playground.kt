@@ -12,8 +12,13 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.Toast
+import com.amir.test.SocketHelper.input
+import com.amir.test.SocketHelper.output
+import com.amir.test.SocketHelper.socket
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -407,10 +412,6 @@ class Playground() {
     ) : SurfaceView(context),
         View.OnTouchListener {
 
-        lateinit var input: BufferedReader
-        lateinit var output: PrintWriter
-        lateinit var socket: Socket
-
         var waitBit: Boolean = false
 
         var callback: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
@@ -460,10 +461,17 @@ class Playground() {
 
             //45.94.213.254
             val textFromServer = GlobalScope.launch {
-                socket = Socket(hostName, port) //todo: fix ipv6
+                try {
+                    socket = Socket(hostName, port) //todo: fix ipv6
 
-                input = BufferedReader(InputStreamReader(socket.getInputStream()))
-                output = PrintWriter(socket.getOutputStream())
+                    input = BufferedReader(InputStreamReader(socket.getInputStream()))
+                    output = PrintWriter(socket.getOutputStream())
+                } catch (ex: Exception) {
+                    socket.close()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "Connection error", Toast.LENGTH_SHORT).show()
+                    }
+                }
 
                 output.printf("%s %d %d %d\n", nickName, game, side, opts)
                 output.flush()

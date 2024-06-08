@@ -18,5 +18,4 @@ class MainActivity() : AppCompatActivity() {
 
         setContentView(Playground().SinglePlayer(this, blockNumber))
     }
-
 }
