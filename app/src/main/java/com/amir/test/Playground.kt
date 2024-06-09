@@ -170,75 +170,6 @@ class Playground() {
         turn++
     }
 
-    /*    private fun move() {
-            if (isAtEdge(glenda)) {
-                state = LOSE
-                return
-            }
-
-            val visited = HashSet<Dot>()
-            val distance = HashMap<Dot?, Int>()
-            val previous = HashMap<Dot?, Dot?>()
-
-            // Initialize all distances to infinity except for the starting dot
-            for (dot in matrix.flatten().filterNotNull()) {
-                distance[dot] = Int.MAX_VALUE
-            }
-            distance[glenda] = 0
-
-            while (visited.size < matrix.size * matrix[0].size) {
-                // Find the dot with the minimum distance among unvisited dots
-                var minDistance = Int.MAX_VALUE
-                var currentDot: Dot? = null
-                for (dot in matrix.flatten().filterNotNull()) {
-                    if (!visited.contains(dot) && distance[dot]!! < minDistance) {
-                        minDistance = distance[dot]!!
-                        currentDot = dot
-                    }
-                }
-
-                if (currentDot == null) {
-                    break
-                }
-
-                visited.add(currentDot)
-
-                // Update distances for neighboring dots
-                for (i in 1..6) {
-                    val neighbor = getNeighbor(currentDot, i)
-                    if (neighbor != null && neighbor.status == Dot.STATUS_OFF && !visited.contains(
-                            neighbor
-                        )
-                    ) {
-                        val edgeWeight = 1 // Assuming all edges have the same weight
-                        val newDistance = distance[currentDot]!! + edgeWeight
-
-                        if (newDistance < distance[neighbor]!!) {
-                            distance[neighbor] = newDistance
-                            previous[neighbor] = currentDot
-                        }
-                    }
-                }
-            }
-
-            // Find the dot with the shortest distance as the best move
-
-            var minDistance = Int.MAX_VALUE
-            for (dot in matrix.flatten().filterNotNull()) {
-                if (distance[dot]!! < minDistance && dot?.status == Dot.STATUS_OFF) {
-                    best = dot
-                    minDistance = distance[dot]!!
-                }
-            }
-
-            if (best == null) {
-                state = PLAYING
-                MoveTo(best)
-            } else {
-                MoveTo(best)
-            }
-        }*/
-
     private fun move() { //?
         val avaliable = Vector<Dot?>()
         val positive = Vector<Dot?>()
@@ -253,13 +184,14 @@ class Playground() {
                 }
             }
         }
-        if(avaliable.size == 0)
+        if (avaliable.size == 0) {
             state = WIN
-        else if (avaliable.size == 1) {
-            best = avaliable[0]!!
+        } else if (avaliable.size == 1) {
+            MoveTo(avaliable[0])
         } else {
             var best: Dot? = null
             if (positive.size != 0) { //Free direction exists
+                println("Step forward")
                 var min = 999
                 for (i in positive.indices) {
                     val a = getDistance(positive[i], al[positive[i]]!!)
@@ -269,6 +201,7 @@ class Playground() {
                     }
                 }
             } else { //All have blocks
+                println("Avoid Blocks")
                 var max = 0
                 for (i in avaliable.indices) {
                     val k = getDistance(avaliable[i], al[avaliable[i]]!!)
@@ -467,7 +400,11 @@ class Playground() {
                 } catch (ex: Exception) {
                     socket.close()
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Connection error", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Check your internet connection",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
@@ -703,10 +640,11 @@ class Playground() {
             } else if (state == LOSE) {
                 c.drawColor(Color.parseColor("#FFCC0000"))
             } else
-                c.drawColor(0, PorterDuff.Mode.CLEAR)//RGBA
+                c.drawColor(0, PorterDuff.Mode.CLEAR) //RGBA
 
             screenWidth = c.width
             screenHeight = c.height
+
 
             val paint = Paint()
             paint.flags = Paint.ANTI_ALIAS_FLAG
@@ -731,6 +669,7 @@ class Playground() {
                             ((screenHeight - ROW * WIDTH) / 2 + (one.y + 1) * WIDTH).toFloat()
                         ), paint
                     )
+
                 }
             }
             holder.unlockCanvasAndPost(c)

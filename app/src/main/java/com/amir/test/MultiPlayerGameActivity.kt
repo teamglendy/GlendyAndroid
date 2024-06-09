@@ -1,7 +1,6 @@
 package com.amir.test
 
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -29,14 +28,8 @@ class MultiPlayerGameActivity : AppCompatActivity() {
 
         setContentView(Playground().MultiPlayer(this, hostname!!, port, nickName!!, game, side, opts))
     }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d("Salam","onStop")
-    }
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("Salam","onDestroy")
         socket.close()
     }
 }
