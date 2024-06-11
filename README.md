@@ -13,11 +13,15 @@ You should choose the side you want to play.</p>
 <p>You can find server for multiplayer mode at:<br>
 http://cloud9p.org/mkf/glendy/HEAD/info.html</p>
 
-|                                        MainActivity Light mode                                        |                                        MainActivity Dark mode                                        |
+# |                                        MainActivity Light mode                                        |                                        MainActivity Dark mode                                        |
+
 |:-----------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------:|
 | ![](https://github.com/Salimiyan/GlendyAndroid/blob/master/screenshots/MainActivity-Light%20mode.png) | ![](https://github.com/Salimiyan/GlendyAndroid/blob/master/screenshots/MainActivity-Dark%20mode.png) |
 
-|                                        GameActivity Light mode                                        |                                        MainActivity Dark mode                                        |
+
+
+# |                                        GameActivity Light mode                                        |                                        MainActivity Dark mode                                        |
+
 |:-----------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------:|
 | ![](https://github.com/Salimiyan/GlendyAndroid/blob/master/screenshots/GameActivity-Light%20mode.png) | ![](https://github.com/Salimiyan/GlendyAndroid/blob/master/screenshots/GameActivity-Dark%20mode.png) |
 
