@@ -1,4 +1,4 @@
-package com.amir.test
+package com.game.glendy
 
 import android.os.Bundle
 import android.view.WindowManager

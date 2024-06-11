@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.amir.test"
+    namespace = "com.game.glendy"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.amir.test"
+        applicationId = "com.game.glendy"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

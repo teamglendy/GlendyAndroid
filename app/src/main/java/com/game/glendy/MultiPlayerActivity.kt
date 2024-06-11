@@ -1,4 +1,4 @@
-package com.amir.test
+package com.game.glendy
 
 import android.content.Intent
 import android.os.Bundle
@@ -40,7 +40,7 @@ class MultiPlayerActivity : AppCompatActivity() {
         glenda = findViewById(R.id.glenda)
 
         hostname.setText("unix.cloud9p.org")
-        port.setText("1768")
+        port.setText("1769")
 
         connect.setOnClickListener {
             val host = hostname.text.toString()

@@ -1,10 +1,10 @@
-package com.amir.test
+package com.game.glendy
 
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.amir.test.SocketHelper.socket
+import com.game.glendy.SocketHelper.socket
 
 class MultiPlayerGameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

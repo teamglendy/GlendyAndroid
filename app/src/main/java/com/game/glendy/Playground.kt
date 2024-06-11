@@ -1,4 +1,4 @@
-package com.amir.test
+package com.game.glendy
 
 import android.content.Context
 import android.graphics.Color
@@ -12,9 +12,9 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.Toast
-import com.amir.test.SocketHelper.input
-import com.amir.test.SocketHelper.output
-import com.amir.test.SocketHelper.socket
+import com.game.glendy.SocketHelper.input
+import com.game.glendy.SocketHelper.output
+import com.game.glendy.SocketHelper.socket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

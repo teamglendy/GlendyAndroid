@@ -1,4 +1,4 @@
-package com.amir.test
+package com.game.glendy
 
 import android.content.Intent
 import android.os.Bundle

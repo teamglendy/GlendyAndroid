@@ -1,4 +1,4 @@
-package com.amir.test
+package com.game.glendy
 
 import org.junit.Test
 
