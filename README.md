@@ -14,6 +14,7 @@ You should choose the side you want to play.</p>
 http://cloud9p.org/mkf/glendy/HEAD/info.html</p>
 
 
+
 |                                        MainActivity Light mode                                        |                                        MainActivity Dark mode                                        |
 |:-----------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------:|
 | ![](https://github.com/Salimiyan/GlendyAndroid/blob/master/screenshots/MainActivity-Light%20mode.png) | ![](https://github.com/Salimiyan/GlendyAndroid/blob/master/screenshots/MainActivity-Dark%20mode.png) |
