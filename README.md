@@ -1,5 +1,5 @@
 <h1>Glendy:</h1>
-<p>Glendy is an amazing strategic game. There are two players. One player plays as Trapper and the other one plays as glenda.<br>
+<p>Glendy is an amazing strategic android game. There are two players. One player plays as Trapper and the other one plays as glenda.<br>
 Glenda tries to escape to the sides of the board and Trapper tries to trap the glenda with putting walls around it.</p>
 <h1>Client Features:</h1>
 <h2>Single Player</h2>
@@ -12,7 +12,7 @@ You should choose the side you want to play.</p>
 <h1>Server:</h1>
 <p>You can find server for multiplayer mode at:<br>
 http://cloud9p.org/mkf/glendy/HEAD/info.html</p>
-
+<h1>Screenshots:</h1>
 
 
 |                                        MainActivity Light mode                                        |                                        MainActivity Dark mode                                        |
